@@ -5,9 +5,9 @@
 - [x] Create basic window and input handling
 - [x] Implement map representation (2D grid)
 - [x] Create player movement and collision detection
-- [x] Implement basic GPU-based wall rendering
 
 ## In Progress Tasks
+- [ ] Implement basic GPU-based wall rendering
 - [ ] Add floor and ceiling rendering with shaders
 - [ ] Implement texture mapping for walls
 
