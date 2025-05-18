@@ -28,14 +28,18 @@ void RenderWorld(Player player, Map map) {
     for (int x = 0; x < screenWidth; x++) {
         // Calculate ray position and direction
         float cameraX = 2.0f * x / (float)screenWidth - 1.0f; // x-coordinate in camera space
+        
+        // Use exact player position as ray origin to match minimap
+        Vector2 rayPos = player.position;
+        
         Vector2 rayDir = {
             player.direction.x + player.plane.x * cameraX,
             player.direction.y + player.plane.y * cameraX
         };
         
-        // Map position
-        int mapX = (int)(player.position.x / TILE_SIZE);
-        int mapY = (int)(player.position.y / TILE_SIZE);
+        // Map position - use rayPos instead of player.position directly
+        int mapX = (int)(rayPos.x / TILE_SIZE);
+        int mapY = (int)(rayPos.y / TILE_SIZE);
         
         // Length of ray from current position to next x or y-side
         Vector2 deltaDist = {
@@ -52,18 +56,18 @@ void RenderWorld(Player player, Map map) {
         // Calculate step and initial sideDist
         if (rayDir.x < 0) {
             stepX = -1;
-            sideDistX = ((player.position.x / TILE_SIZE) - mapX) * deltaDist.x;
+            sideDistX = ((rayPos.x / TILE_SIZE) - mapX) * deltaDist.x;
         } else {
             stepX = 1;
-            sideDistX = (mapX + 1.0f - (player.position.x / TILE_SIZE)) * deltaDist.x;
+            sideDistX = (mapX + 1.0f - (rayPos.x / TILE_SIZE)) * deltaDist.x;
         }
         
         if (rayDir.y < 0) {
             stepY = -1;
-            sideDistY = ((player.position.y / TILE_SIZE) - mapY) * deltaDist.y;
+            sideDistY = ((rayPos.y / TILE_SIZE) - mapY) * deltaDist.y;
         } else {
             stepY = 1;
-            sideDistY = (mapY + 1.0f - (player.position.y / TILE_SIZE)) * deltaDist.y;
+            sideDistY = (mapY + 1.0f - (rayPos.y / TILE_SIZE)) * deltaDist.y;
         }
         
         // DDA algorithm
@@ -91,15 +95,20 @@ void RenderWorld(Player player, Map map) {
         // Calculate distance projected on camera direction
         float perpWallDist;
         if (side == 0) {
-            perpWallDist = (mapX - player.position.x / TILE_SIZE + (1 - stepX) / 2) / rayDir.x;
+            perpWallDist = (mapX - rayPos.x / TILE_SIZE + (1 - stepX) / 2) / rayDir.x;
         } else {
-            perpWallDist = (mapY - player.position.y / TILE_SIZE + (1 - stepY) / 2) / rayDir.y;
+            perpWallDist = (mapY - rayPos.y / TILE_SIZE + (1 - stepY) / 2) / rayDir.y;
         }
         
         perpWallDist *= TILE_SIZE; // Scale by tile size
         
+        // Apply a distance reduction factor to make walls appear closer
+        perpWallDist *= 0.4f; // Further reduce distance perception for more dramatic closeness
+        
         // Calculate height of line to draw on screen
-        int lineHeight = (int)(screenHeight / perpWallDist);
+        // Increase the perceived wall height by multiplying by a factor (makes walls appear closer)
+        float distanceFactor = 2.0f; // Increased from 1.5 to 2.0 for taller walls (closer appearance)
+        int lineHeight = (int)(screenHeight / perpWallDist * distanceFactor);
         
         // Calculate lowest and highest pixel to fill in current stripe
         int drawStart = -lineHeight / 2 + screenHeight / 2;
@@ -122,12 +131,18 @@ void RenderWorld(Player player, Map map) {
             default:             color = PURPLE; break;
         }
         
-        // Make color darker for y-sides
+        // Make color darker for y-sides but keep them visible enough
         if (side == 1) {
-            color.r = color.r / 2;
-            color.g = color.g / 2;
-            color.b = color.b / 2;
+            color.r = (color.r * 0.7f); // Less darkening (0.7 instead of 0.5)
+            color.g = (color.g * 0.7f);
+            color.b = (color.b * 0.7f);
         }
+        
+        // Enhance wall colors to make them more visible
+        float colorEnhancement = 1.2f; // Slight enhancement to make walls pop more
+        color.r = Clamp(color.r * colorEnhancement, 0, 255);
+        color.g = Clamp(color.g * colorEnhancement, 0, 255);
+        color.b = Clamp(color.b * colorEnhancement, 0, 255);
         
         // Draw the pixels of the stripe as a vertical line
         DrawLine(x, drawStart, x, drawEnd, color);
