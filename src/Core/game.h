@@ -16,6 +16,7 @@ typedef struct GameState {
     bool showDebugInfo;
     Vector2 previousMousePosition;
     float mouseSensitivity;
+    int screenshotCounter; // Counter for tracking screenshot numbers
 } GameState;
 
 // Game state management functions

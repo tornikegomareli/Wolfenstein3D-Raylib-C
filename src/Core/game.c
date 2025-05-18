@@ -11,6 +11,7 @@ void InitGame(GameState* state) {
     state->mouseLookEnabled = true;
     state->previousMousePosition = (Vector2){ 0, 0 };
     state->mouseSensitivity = 0.1f;
+    state->screenshotCounter = 1; // Start screenshot numbering from 1
     
     // Initialize resources
     LoadGameResources(&state->textures);
@@ -34,6 +35,19 @@ void UpdateGame(GameState* state) {
     // Toggle debug info with F1
     if (IsKeyPressed(KEY_F1)) {
         state->showDebugInfo = !state->showDebugInfo;
+    }
+    
+    // Take screenshot with P key
+    if (IsKeyPressed(KEY_P)) {
+        // Create a filename with the counter
+        char screenshotFilename[64];
+        sprintf(screenshotFilename, "screenshot_%03d.png", state->screenshotCounter++);
+        
+        // Take the screenshot using raylib's built-in function
+        TakeScreenshot(screenshotFilename);
+        
+        // Provide feedback (will appear in console)
+        TraceLog(LOG_INFO, "Screenshot saved: %s", screenshotFilename);
     }
     
     // Process mouse look if enabled
@@ -117,12 +131,13 @@ void RenderGame(GameState* state) {
         DrawText(angleText, 10, 70, 20, RAYWHITE);
         
         // Controls help
-        DrawText("Controls:", 10, screenHeight - 150, 20, YELLOW);
-        DrawText("WASD: Move", 10, screenHeight - 120, 20, RAYWHITE);
-        DrawText("Mouse/Arrows: Look", 10, screenHeight - 100, 20, RAYWHITE);
-        DrawText("Space: Open door", 10, screenHeight - 80, 20, RAYWHITE);
-        DrawText("ESC: Toggle mouse", 10, screenHeight - 60, 20, RAYWHITE);
-        DrawText("F: Fullscreen", 10, screenHeight - 40, 20, RAYWHITE);
+        DrawText("Controls:", 10, screenHeight - 170, 20, YELLOW);
+        DrawText("WASD: Move", 10, screenHeight - 140, 20, RAYWHITE);
+        DrawText("Mouse/Arrows: Look", 10, screenHeight - 120, 20, RAYWHITE);
+        DrawText("Space: Open door", 10, screenHeight - 100, 20, RAYWHITE);
+        DrawText("ESC: Toggle mouse", 10, screenHeight - 80, 20, RAYWHITE);
+        DrawText("F: Fullscreen", 10, screenHeight - 60, 20, RAYWHITE);
+        DrawText("P: Take screenshot", 10, screenHeight - 40, 20, RAYWHITE);
         DrawText("F1: Toggle debug", 10, screenHeight - 20, 20, RAYWHITE);
     }
 }
