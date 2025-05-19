@@ -7,11 +7,13 @@
 - [x] Create player movement and collision detection
 
 ## In Progress Tasks
-- [ ] Implement basic GPU-based wall rendering
-- [ ] Add floor and ceiling rendering with shaders
-- [ ] Implement texture mapping for walls
+- [x] Implement basic GPU-based wall rendering
+- [x] Add floor and ceiling rendering with shaders
+- [x] Implement texture mapping for walls
+- [x] Add toggle between CPU and GPU rendering (Press F2)
 
 ## Pending Tasks
+- [ ] Fix GPU rendering texturing issues
 - [ ] Create sprite rendering system
 - [ ] Implement simple enemy AI
 - [ ] Add weapon system with shooting mechanics
